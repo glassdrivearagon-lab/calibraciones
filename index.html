@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Profesional de Calibraciones ADAS</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-brand">
+                    <div class="header-logo">⚙️</div>
+                    <div class="header-title">
+                        <h1>Sistema ADAS Pro</h1>
+                        <p class="header-subtitle">Gestión Profesional de Calibraciones</p>
+                    </div>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <div class="user-details">
+                        <span id="currentUser">Iniciar Sesión</span>
+                        <span id="currentEquipment" class="equipment-info"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div class="modal hidden" id="loginModal">
+        <div class="modal__content">
+            <div class="card login-card">
+                <div class="card__header">
+                    <h2>🔐 Iniciar Sesión</h2>
+                    <p>Selecciona usuario, taller y equipo de diagnóstico</p>
+                </div>
+                <div class="card__body">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label class="form-label" for="userSelect">👤 Usuario</label>
+                            <select class="form-control" id="userSelect" required>
+                                <option value="">Selecciona un usuario</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="tallerSelect">🏢 Taller</label>
+                            <select class="form-control" id="tallerSelect" required>
+                                <option value="">Selecciona un taller</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="equipoSelect">🔧 Equipo de Diagnóstico</label>
+                            <select class="form-control" id="equipoSelect" required>
+                                <option value="">Selecciona un equipo</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">🚀 Iniciar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav" id="mainNav" style="display: none;">
+        <div class="container">
+            <div class="nav-buttons">
+                <button class="btn btn--primary nav-btn active" data-section="registrar">
+                    <span class="nav-btn__icon">📝</span>
+                    <span>Nueva Calibración</span>
+                </button>
+                <button class="btn btn--outline nav-btn" data-section="consultar">
+                    <span class="nav-btn__icon">🔍</span>
+                    <span>Consultar</span>
+                </button>
+                <button class="btn btn--outline nav-btn" data-section="informes">
+                    <span class="nav-btn__icon">📊</span>
+                    <span>Informes</span>
+                </button>
+                <button class="btn btn--outline nav-btn" data-section="historico">
+                    <span class="nav-btn__icon">📈</span>
+                    <span>Estadísticas</span>
+                </button>
+                <button class="btn btn--secondary" id="logoutBtn">
+                    <span class="nav-btn__icon">🚪</span>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Registrar Calibración Section -->
+            <section class="content-section active" id="registrarSection">
+                <div class="section-header">
+                    <h2>🚗 Nueva Calibración ADAS</h2>
+                    <p class="section-description">Proceso paso a paso para registro completo de calibración</p>
+                </div>
+
+                <!-- Vehicle Search -->
+                <div class="wizard-step card" id="step1">
+                    <div class="card__header">
+                        <h3>Paso 1: Seleccionar Vehículo</h3>
+                        <div class="step-indicator">1 / 4</div>
+                    </div>
+                    <div class="card__body">
+                        <form id="vehicleSearchForm">
+                            <div class="search-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="searchVin">🆔 VIN</label>
+                                    <input type="text" class="form-control" id="searchVin" placeholder="WVGZZZCSZPY088518">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="searchMatricula">🚙 Matrícula</label>
+                                    <input type="text" class="form-control" id="searchMatricula" placeholder="2429MJR">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="searchMarca">🏭 Marca</label>
+                                    <input type="text" class="form-control" id="searchMarca" placeholder="Volkswagen">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="searchModelo">🚘 Modelo</label>
+                                    <input type="text" class="form-control" id="searchModelo" placeholder="Taigo">
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <button type="submit" class="btn btn--primary">🔍 Buscar Vehículo</button>
+                                <button type="button" class="btn btn--secondary" id="newVehicleBtn">➕ Crear Nuevo</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Vehicle Details -->
+                <div class="wizard-step card hidden" id="vehicleDetails">
+                    <div class="card__header">
+                        <h3>Detalles del Vehículo Seleccionado</h3>
+                    </div>
+                    <div class="card__body">
+                        <div id="vehicleInfo"></div>
+                        <div class="step-actions">
+                            <button class="btn btn--primary" id="continueToCalibrationBtn">▶️ Continuar</button>
+                            <button class="btn btn--outline" id="backToSearchBtn">◀️ Buscar Otro</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Vehicle Form -->
+                <div class="wizard-step card hidden" id="newVehicleForm">
+                    <div class="card__header">
+                        <h3>Crear Nuevo Vehículo</h3>
+                    </div>
+                    <div class="card__body">
+                        <form id="createVehicleForm">
+                            <div class="vehicle-form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="newVin">🆔 VIN *</label>
+                                    <input type="text" class="form-control" id="newVin" maxlength="17" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newMatricula">🚙 Matrícula *</label>
+                                    <input type="text" class="form-control" id="newMatricula" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newMarca">🏭 Marca *</label>
+                                    <input type="text" class="form-control" id="newMarca" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newModelo">🚘 Modelo *</label>
+                                    <input type="text" class="form-control" id="newModelo" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newVersion">⚙️ Versión</label>
+                                    <input type="text" class="form-control" id="newVersion">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newAño">📅 Año *</label>
+                                    <input type="number" class="form-control" id="newAño" min="2000" max="2025" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newCombustible">⛽ Combustible</label>
+                                    <select class="form-control" id="newCombustible">
+                                        <option value="Gasolina">Gasolina</option>
+                                        <option value="Diesel">Diesel</option>
+                                        <option value="Híbrido">Híbrido</option>
+                                        <option value="Eléctrico">Eléctrico</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newPotencia">💪 Potencia</label>
+                                    <input type="text" class="form-control" id="newPotencia" placeholder="110 CV">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="newCodigoMotor">🔧 Código Motor</label>
+                                    <input type="text" class="form-control" id="newCodigoMotor">
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <button type="submit" class="btn btn--primary">✅ Crear y Continuar</button>
+                                <button type="button" class="btn btn--outline" id="cancelNewVehicle">❌ Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Calibration Config -->
+                <div class="wizard-step card hidden" id="step2">
+                    <div class="card__header">
+                        <h3>Paso 2: Configuración de Calibración</h3>
+                        <div class="step-indicator">2 / 4</div>
+                    </div>
+                    <div class="card__body">
+                        <form id="calibrationConfigForm">
+                            <div class="config-form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="motivoIntervencion">📋 Motivo de Intervención *</label>
+                                    <select class="form-control" id="motivoIntervencion" required>
+                                        <option value="">Seleccionar motivo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="tipoCalibracion">⚙️ Tipo de Calibración *</label>
+                                    <select class="form-control" id="tipoCalibracion" required>
+                                        <option value="">Seleccionar tipo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="observacionesIniciales">📝 Observaciones Iniciales</label>
+                                    <textarea class="form-control" id="observacionesIniciales" rows="3" placeholder="Notas adicionales..."></textarea>
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <button type="submit" class="btn btn--primary">▶️ Continuar</button>
+                                <button type="button" class="btn btn--outline" id="backToVehicleBtn">◀️ Volver</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Measurements -->
+                <div class="wizard-step card hidden" id="step3">
+                    <div class="card__header">
+                        <h3>Paso 3: Mediciones Técnicas</h3>
+                        <div class="step-indicator">3 / 4</div>
+                    </div>
+                    <div class="card__body">
+                        <form id="measurementsForm">
+                            <div id="measurementsContainer"></div>
+                            <div class="step-actions">
+                                <button type="submit" class="btn btn--primary">▶️ Finalizar Mediciones</button>
+                                <button type="button" class="btn btn--outline" id="backToConfigBtn">◀️ Volver</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="wizard-step card hidden" id="step4">
+                    <div class="card__header">
+                        <h3>Paso 4: Resultados y Finalización</h3>
+                        <div class="step-indicator">4 / 4</div>
+                    </div>
+                    <div class="card__body">
+                        <div id="calibrationSummary"></div>
+                        <div class="step-actions">
+                            <button class="btn btn--success" id="finishSuccessBtn">✅ Finalizar - ÉXITO</button>
+                            <button class="btn btn--error" id="finishErrorBtn">❌ Finalizar - ERROR</button>
+                            <button class="btn btn--outline" id="backToMeasurementsBtn">◀️ Volver</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Finish Modal -->
+            <div class="modal hidden" id="finishModal">
+                <div class="modal__content">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3 id="finishModalTitle">Finalizar Calibración</h3>
+                        </div>
+                        <div class="card__body">
+                            <form id="finishForm">
+                                <div id="errorFields" class="hidden">
+                                    <div class="form-group">
+                                        <label class="form-label" for="errorDescription">🚫 Descripción del Error</label>
+                                        <textarea class="form-control" id="errorDescription" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="solutionApplied">🔧 Solución Aplicada</label>
+                                        <textarea class="form-control" id="solutionApplied" rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="finalNotes">📝 Notas Finales</label>
+                                    <textarea class="form-control" id="finalNotes" rows="3" placeholder="Observaciones adicionales..."></textarea>
+                                </div>
+                                <div class="step-actions">
+                                    <button type="submit" class="btn btn--primary">✅ Confirmar Finalización</button>
+                                    <button type="button" class="btn btn--outline" id="cancelFinish">❌ Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consultar Section -->
+            <section class="content-section" id="consultarSection">
+                <div class="section-header">
+                    <h2>🔍 Consultar Calibraciones</h2>
+                    <p class="section-description">Búsqueda avanzada y visualización de calibraciones</p>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3>🎛️ Filtros de Búsqueda</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="filter-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="filterTaller">🏢 Taller</label>
+                                <select class="form-control" id="filterTaller">
+                                    <option value="">Todos los talleres</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="filterEstado">📊 Estado</label>
+                                <select class="form-control" id="filterEstado">
+                                    <option value="">Todos los estados</option>
+                                    <option value="En Proceso">En Proceso</option>
+                                    <option value="Completado - OK">Completado - OK</option>
+                                    <option value="Completado - ERROR">Completado - ERROR</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="filterFechaInicio">📅 Fecha Desde</label>
+                                <input type="date" class="form-control" id="filterFechaInicio">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="filterFechaFin">📅 Fecha Hasta</label>
+                                <input type="date" class="form-control" id="filterFechaFin">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="filterTecnico">👤 Técnico</label>
+                                <select class="form-control" id="filterTecnico">
+                                    <option value="">Todos los técnicos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="step-actions">
+                            <button class="btn btn--primary" id="applyFiltersBtn">🔍 Aplicar Filtros</button>
+                            <button class="btn btn--outline" id="clearFiltersBtn">🧹 Limpiar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3>📋 Lista de Calibraciones</h3>
+                        <div class="results-counter" id="resultsCounter">0 resultados</div>
+                    </div>
+                    <div class="card__body">
+                        <div id="calibrationsList"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Informes Section -->
+            <section class="content-section" id="informesSection">
+                <div class="section-header">
+                    <h2>📊 Generar Informes</h2>
+                    <p class="section-description">Informes profesionales de calibraciones realizadas</p>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3>📄 Seleccionar Calibración</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="form-group">
+                            <label class="form-label" for="selectCalibrationForReport">Calibración</label>
+                            <select class="form-control" id="selectCalibrationForReport">
+                                <option value="">Seleccionar calibración...</option>
+                            </select>
+                        </div>
+                        <div class="step-actions">
+                            <button class="btn btn--primary" id="generateReportBtn" disabled>📊 Generar Informe</button>
+                            <button class="btn btn--secondary" id="previewReportBtn" disabled>👁️ Vista Previa</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card hidden" id="reportPreview">
+                    <div class="card__header">
+                        <h3>👁️ Vista Previa del Informe</h3>
+                    </div>
+                    <div class="card__body">
+                        <div id="reportContent"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Histórico Section -->
+            <section class="content-section" id="historicoSection">
+                <div class="section-header">
+                    <h2>📈 Estadísticas y Análisis</h2>
+                    <p class="section-description">Análisis histórico y métricas de rendimiento</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card__icon">📊</div>
+                        <div class="stat-card__header">
+                            <h4>Total Calibraciones</h4>
+                        </div>
+                        <div class="stat-card__value" id="totalCalibraciones">0</div>
+                    </div>
+                    <div class="stat-card stat-card--success">
+                        <div class="stat-card__icon">✅</div>
+                        <div class="stat-card__header">
+                            <h4>Tasa de Éxito</h4>
+                        </div>
+                        <div class="stat-card__value" id="tasaExito">0%</div>
+                    </div>
+                    <div class="stat-card stat-card--warning">
+                        <div class="stat-card__icon">⏱️</div>
+                        <div class="stat-card__header">
+                            <h4>Tiempo Promedio</h4>
+                        </div>
+                        <div class="stat-card__value" id="tiempoPromedio">0 min</div>
+                    </div>
+                    <div class="stat-card stat-card--info">
+                        <div class="stat-card__icon">💰</div>
+                        <div class="stat-card__header">
+                            <h4>Coste Promedio</h4>
+                        </div>
+                        <div class="stat-card__value" id="costePromedio">€0</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>📈 Calibraciones por Mes</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="monthlyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>🥧 Distribución por Estado</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3>📋 Historial Completo</h3>
+                    </div>
+                    <div class="card__body">
+                        <div id="historicalList"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Report Modal -->
+    <div class="modal hidden" id="reportModal">
+        <div class="modal__content modal__content--large">
+            <div class="card">
+                <div class="card__header">
+                    <h3>📄 Informe de Calibración ADAS</h3>
+                    <button class="btn btn--outline btn--sm" id="closeReportModal">✖️</button>
+                </div>
+                <div class="card__body">
+                    <div id="reportModalContent"></div>
+                    <div class="step-actions">
+                        <button class="btn btn--primary" id="downloadReportBtn">💾 Descargar PDF</button>
+                        <button class="btn btn--secondary" id="printReportBtn">🖨️ Imprimir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
