@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Calibraciones ADAS - GlassDrive</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-brand">
+                <img src="logolargo.jpg" alt="GlassDrive" class="header-logo">
+                <div class="header-title-container">
+                    <div class="header-title">Sistema de Calibraciones ADAS</div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="currentUser">Sistema ADAS</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard View -->
+        <div id="dashboardView">
+            <h2>Panel Principal</h2>
+            <div class="dashboard">
+                <div class="card" onclick="app.showNewCalibration()">
+                    <div class="card-icon">📷</div>
+                    <div class="card-title">Nueva Calibración</div>
+                    <div class="card-description">Iniciar proceso de calibración</div>
+                </div>
+                <div class="card" onclick="app.showSearch()">
+                    <div class="card-icon">🔍</div>
+                    <div class="card-title">Buscar</div>
+                    <div class="card-description">Consultar calibraciones</div>
+                </div>
+                <div class="card" onclick="app.showHistory()">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">Histórico</div>
+                    <div class="card-description">Ver todas las calibraciones</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Calibration Wizard -->
+        <div id="calibrationWizard" class="hidden">
+            <div class="wizard">
+                <div class="wizard-steps">
+                    <div class="wizard-step active" data-step="1">
+                        <div class="wizard-step-number">1</div>
+                        <div class="wizard-step-title">Técnico</div>
+                    </div>
+                    <div class="wizard-step" data-step="2">
+                        <div class="wizard-step-number">2</div>
+                        <div class="wizard-step-title">Foto Vehículo</div>
+                    </div>
+                    <div class="wizard-step" data-step="3">
+                        <div class="wizard-step-number">3</div>
+                        <div class="wizard-step-title">Datos Vehículo</div>
+                    </div>
+                    <div class="wizard-step" data-step="4">
+                        <div class="wizard-step-number">4</div>
+                        <div class="wizard-step-title">Datos Adicionales</div>
+                    </div>
+                    <div class="wizard-step" data-step="5">
+                        <div class="wizard-step-number">5</div>
+                        <div class="wizard-step-title">Calibración</div>
+                    </div>
+                </div>
+                <div class="wizard-content" id="wizardContent"></div>
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button class="btn" id="btnBack" onclick="app.previousStep()" style="display: none;">
+                        ← Atrás
+                    </button>
+                    <button class="btn btn-primary" id="btnCancel" onclick="app.showDashboard()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search View -->
+        <div id="searchView" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>🔍 Buscar Calibraciones</h2>
+                <button class="btn" onclick="app.showDashboard()">← Volver</button>
+            </div>
+            <div class="search-filters">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label class="form-label">Marca</label>
+                        <select class="form-control" id="filterMarca">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Modelo</label>
+                        <select class="form-control" id="filterModelo">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Matrícula</label>
+                        <input type="text" class="form-control" id="filterMatricula" placeholder="Buscar por matrícula">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select class="form-control" id="filterEstado">
+                            <option value="">Todos</option>
+                            <option value="completada">Completada</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="en_proceso">En Proceso</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="app.applyFilters()">Buscar</button>
+                    <button class="btn" onclick="app.clearFilters()">Limpiar Filtros</button>
+                </div>
+            </div>
+            <div id="searchResults" class="results-list"></div>
+        </div>
+
+        <!-- History View -->
+        <div id="historyView" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>📊 Histórico de Calibraciones</h2>
+                <button class="btn" onclick="app.showDashboard()">← Volver</button>
+            </div>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
+    <!-- App JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
